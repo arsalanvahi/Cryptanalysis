@@ -1,42 +1,52 @@
 #include <stdio.h>
-#include <stdlib.h>
 
-/* run this program using the console pauser or add your own getch, system("pause") or input loop */
+/*When masking, counting number of zeros has no importance. Your aim is 
+to calculate the XOR of the masked bits.
+
+Example:
+Let input value be 1111 and mask is 1110
+Then you AND these two values: 1111 AND 1110 = 1110
+Then you XOR all these values: 1 XOR 1 XOR 1 XOR 0 = 1
+
+Then you do the same thing for the output mask and check if the result 
+(which can be either 0 or 1) is the same.
+
+As you can see, this has nothing to do with the number of zeros.
+
+Best regards,*/
+
 int sBox[16] = {9, 11, 12, 4, 10, 1, 2, 6, 13, 7, 3, 8, 15, 14, 0, 5};
-
-
-int approxTable[16][16];
-
-int mask(int value, int mask) //count the number of 0's
+int linApproxTable[16][16];
+int mask(unsigned char input, unsigned char msk) //count the number of 0's
 {
-    int interValue = value & mask;
-    int total = 0;
+    unsigned char maskedValue = input & msk;
+    int mskResult = 0;
     
-    while(interValue > 0)
+    while(maskedValue > 0)
     {
-        int temp = interValue % 2;    
-        interValue /= 2;
+        unsigned char tmp = maskedValue % 2;    
+        maskedValue /= 2;
+        mskResult = mskResult ^ tmp;
         
-        if (temp == 0) 
-            total++;
-    } 
-    return total;   
+    }
+    return mskResult;   
 }
-   
-
-
-int main(int argc, char *argv[]) {
-	int c, m, x; //x: input of the sbox ; m: mask 
-    
-    for(c = 0; c < 16; c++)                                         //output mask
-        for(m = 0; m < 16; m++)                                     //input mask
-            for(x = 0; x < 16; x++)                                 //input
-                if (mask(x, m) == mask(sBox[x], c))
-                    approxTable[m][c]++;  
-					  
-    for(c = 0; c < 16; c++){
-    	 for(m = 0; m < 16; m++){
-        	printf("%4d", approxTable[c][m]-8);    
+int main(){
+	int i,j;
+	unsigned char x, xMask,yMask;
+	for(yMask=0;yMask<16;yMask++){
+		for(xMask=0;xMask<16;xMask++){
+			for(x=0;x<16;x++){
+				if(mask(x,xMask) == mask(sBox[x],yMask))
+					linApproxTable[xMask][yMask]++;
+			}
+		}
+	}
+	
+	for(i=0;i<16;i++){
+		for(j=0;j<16;j++){
+			printf("%4d",linApproxTable[i][j]-8);
+		
 		}
 		printf("\n");
 	}
